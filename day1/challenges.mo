@@ -54,7 +54,7 @@ actor {
     ```
     */
     public query func test_divide(n : Nat, m : Nat) : async Bool {
-        Nat.rem(n, m) == 0;
+        Nat.rem(m, n) == 0;
     };
 
     /** 6. Write a function **is_even** that takes a natural number n and returns a boolean indicating if n is even.
@@ -63,6 +63,6 @@ actor {
     ```
     */
     public query func is_even(n : Nat) : async Bool {
-        Nat.rem(n, 2) == 0;
+        Nat.rem(2, n) == 0;
     };
 };
