@@ -6,8 +6,9 @@ import Iter "mo:base/Iter";
 import List "mo:base/List";
 import Nat "mo:base/Nat";
 import Nat32 "mo:base/Nat32";
+import Option "mo:base/Option";
 import Text "mo:base/Text";
-import TrieSet "mo:base/TrieSet";
+import Trie "mo:base/Trie";
 
 actor {
 
@@ -66,8 +67,71 @@ actor {
     ```
     */
     public query func find_duplicates(a : [Nat]) : async [Nat] {
-        let aSet = TrieSet.fromArray(a, Nat32.fromNat, Nat.equal)
+        type FoldTrie = Trie.Trie<Nat, Bool>;
+        type FoldDups = { dupTrie : FoldTrie; dupList : List.List<Nat> };
 
+        func makeKey(n : Nat) : Trie.Key<Nat> {
+            { hash = Nat32.fromNat(n); key = n };
+        };
+
+        func check(natsSoFar : FoldTrie, n : Nat) : FoldTrie {
+            // The Trie requires we provide a Trie.Key of n, not just n.
+            let nKey = makeKey(n);
+
+            switch (Trie.find(natsSoFar, nKey, Nat.equal)) {
+                case null {
+                    // We've never seen this value of n, so record that it's been seen
+                    // just once.
+                    Trie.put(natsSoFar, nKey, Nat.equal, false).0;
+                };
+                case (?false) {
+                    // We've seen n once before, so now we know that it's a duplicate.
+                    // Push it onto the list so order is preserved, and record that we've
+                    // seen it before.
+                    Trie.put(natsSoFar, nKey, Nat.equal, true).0;
+                };
+                case (?true) {
+                    // Found that n is a duplicate, but it's already been recorded, so
+                    // just continue with no changes.
+                    natsSoFar;
+                };
+            };
+        };
+
+        let natFreqs = Array.foldLeft(a, Trie.empty() : FoldTrie, check);
+
+        func isDuplicate(n : Nat, freqs : FoldTrie) : Bool {
+            Option.get(
+                Trie.find(freqs, makeKey(n), Nat.equal),
+                false,
+            );
+        };
+
+        /** Traverse Array a once again and prepend the duplicates to a List in the same
+             order as they appear in a. Since they are prepended, the List will be in reverse
+             order, so we need to reverse the resulting Array.
+         */
+        Array.reverse(
+            // Correct the order, since we prepended to a List.
+            List.toArray(
+                // An Array result is part of the requirements.
+                Array.foldLeft(
+                    a, // Scan a again.
+                    { dupTrie = natFreqs; dupList = List.nil() }, // 1st FoldDups.
+                    func(accum : FoldDups, n : Nat) : FoldDups {
+                        // Reducing func.
+                        if (isDuplicate(n, accum.dupTrie))({
+                            dupTrie = Trie.remove(
+                                accum.dupTrie,
+                                makeKey(n),
+                                Nat.equal,
+                            ).0; // Don't record n again when we see it later in a.
+                            dupList = List.push(n, accum.dupList); // Record n.
+                        }) else accum;
+                    },
+                ).dupList,
+            ),
+        );
     };
 
     /** 6. Write a function **convert_to_binary** that takes a natural number n and returns a string representing the binary representation of n.

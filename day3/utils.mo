@@ -1,5 +1,4 @@
 import Array "mo:base/Array";
-import Func "mo:base/Func";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import List "mo:base/List";
@@ -15,7 +14,7 @@ actor {
 
     Function `second_maximum_short`, implemented below, is simple and easy to understand, but is only suitable for a small input array. Since it uses Array.sort, it is O(n*log(n)). The version `second_maximum`, however, does just one pass over the array, so is O(n).
     */
-    public query func second_maximum(array : [Int]) : async Int {
+    public func second_maximum(array : [Int]) : async Int {
         type Top2 = { biggest : Int; secondBiggest : Int; init2nd : Bool };
 
         func is2ndBiggestSoFar(x : Int, t2 : Top2) : Bool {
@@ -40,7 +39,7 @@ actor {
 
     /** Function `second_maximum_short`, implemented below, is simple and easy to understand, but is only suitable for a small input array. Since it uses Array.sort, it is O(n*log(n)). However, the version `second_maximum`, above, does just one pass over the array, so is O(n).
     */
-    public query func second_maximum_short(array : [Int]) : async Int {
+    public func second_maximum_short(array : [Int]) : async Int {
         if (array.size() == 1) array[0] else {
             Array.sort(array, Int.compare)[array.size() - 2];
         };
@@ -51,7 +50,7 @@ actor {
     remove_event(array : [Nat]) -> [Nat];
     ```
     */
-    public query func remove_even(array : [Nat]) : async [Nat] {
+    public func remove_even(array : [Nat]) : async [Nat] {
         Array.filter<Nat>(array, func(n) { Nat.rem(n, 2) != 0 });
     };
 
