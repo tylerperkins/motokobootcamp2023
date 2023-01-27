@@ -141,11 +141,12 @@ actor {
     ```
     */
     public query func convert_to_binary(n : Nat) : async Text {
-        func nat64ToText(n64 : Nat64, t : Text) : Text {
-            if (n64 == 0) t
-            else {
+        func nat64ToBits(n64 : Nat64, t : Text) : Text {
+            if (n64 == 0) {
+                if (t == "") "0" else t
+            } else {
                 let text0Or1 = ["0", "1"];
-                nat64ToText(
+                nat64ToBits(
                     Nat64.bitshiftRight(n64, 1),
                     text0Or1[
                         Nat64.toNat(Nat64.bitand(n64, Nat64.fromNat(1)))
@@ -153,6 +154,6 @@ actor {
                 )
             }
         };
-        nat64ToText(Nat64.fromNat(n), "");
+        nat64ToBits(Nat64.fromNat(n), "");
     };
 };
