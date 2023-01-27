@@ -6,10 +6,10 @@ import Iter "mo:base/Iter";
 import List "mo:base/List";
 import Nat "mo:base/Nat";
 import Nat32 "mo:base/Nat32";
+import Nat64 "mo:base/Nat64";
 import Option "mo:base/Option";
 import Text "mo:base/Text";
 import Trie "mo:base/Trie";
-import Nat64 "mo:base/Nat64";
 
 actor {
 
